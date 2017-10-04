@@ -10,52 +10,6 @@ var path = require('path');
 var fs = require('fs');
 
 var url = 'mongodb://localhost:27017/test';
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index');
-});
-
-router.get('/get-data', function(req, res, next) {
-  var resultArray = [];
-  mongo.connect(url, function(err, db) {
-    assert.equal(null, err);
-    var cursor = db.collection('user-data').find();
-    cursor.forEach(function(doc, err) {
-      assert.equal(null, err);
-      resultArray.push(doc);
-    }, function() {
-      db.close();
-      res.render('index', {items: resultArray});
-    });
-  });
-});
-
-router.get('/get-data/:id', function(req, res, next) {
-    var resultArray = [];
-    var id = req.params.id;
-    console.log('Retrieving item: ' + id);
-
-    mongo.connect(url, function(err, db) {
-        // assert.equal(null, err);
-        // db.collection('user-data', function(err, collection) {
-        //     collection.findOne({'_id':new BSON.ObjectID(id)}, function(err, item) {
-        //         res.render('index', item);
-        //     });
-        // });
-        // db.close();
-
-        // var cursor = collection.findOne({'_id':new BSON.ObjectID(id)});
-        // cursor.forEach(function(doc, err) {
-        //     assert.equal(null, err);
-        //     resultArray.push(doc);
-        // }, function() {
-        //     db.close();
-        //     res.render('index', {items: resultArray});
-        // });
-    });
-});
-
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './uploads')
@@ -84,6 +38,63 @@ var upload = multer({
         callback(null, true)
     }
 }).single('userImage');
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index');
+});
+
+var ObjectID = require('mongodb').ObjectID;
+router.get('/get-data/:id', function(req, res, next) {
+    mongo.connect(url, function(err, db) {
+        assert.equal(null, err);
+        const id = req.params.id;
+        const details = { '_id': new ObjectID(id) };
+
+        db.collection('user-data', function(err, collection) {
+            collection.findOne(details, function(err, item) {
+               console.log('item');
+               console.log(item);
+               //res.end('item', item);
+                res.send(item);
+            });
+        });
+        db.close();
+    });
+});
+
+router.get('/get-all-data', function(req, res, next) {
+    var resultArray = [];
+    mongo.connect(url, function(err, db) {
+        assert.equal(null, err);
+        var cursor = db.collection('user-data').find();
+        cursor.forEach(function(doc, err) {
+            assert.equal(null, err);
+            resultArray.push(doc);
+        }, function() {
+            db.close();
+            console.log("get-all-data");
+            res.send(resultArray);
+        });
+    });
+});
+
+router.get('/get-data', function(req, res, next) {
+  var resultArray = [];
+  mongo.connect(url, function(err, db) {
+    assert.equal(null, err);
+    var cursor = db.collection('user-data').find();
+    cursor.forEach(function(doc, err) {
+      assert.equal(null, err);
+      resultArray.push(doc);
+    }, function() {
+      db.close();
+      console.log(resultArray);
+      res.render('index', {items: resultArray});
+    });
+  });
+});
+
 
 //router.post('/insert', , multer({storage: storage, dest: './uploads/'}).single('userImage'), function(req, res, next) {
 router.post('/insert', upload, function(req, res, next) {
