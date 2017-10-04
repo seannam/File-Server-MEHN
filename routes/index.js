@@ -74,7 +74,7 @@ router.get('/get-all-data', function(req, res, next) {
         }, function() {
             db.close();
             console.log("get-all-data");
-            res.send(resultArray);
+            res.send(JSON.stringify({rewards: resultArray}));
         });
     });
 });
