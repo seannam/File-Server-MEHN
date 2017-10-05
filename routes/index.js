@@ -9,7 +9,7 @@ var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
 
-var url = 'mongodb://localhost:27017/test';
+var url = 'mongodb://localhost:27017/data';
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './uploads')
@@ -19,7 +19,6 @@ var storage = multer.diskStorage({
         console.log(file);
 
         filename = file.fieldname + '-' + Date.now() + path.extname(file.originalname);
-        //filename = file.fieldname + '-' + file.originalname;
         console.log("filename");
         console.log(filename);
 
@@ -96,15 +95,8 @@ router.get('/get-data', function(req, res, next) {
 });
 
 
-//router.post('/insert', , multer({storage: storage, dest: './uploads/'}).single('userImage'), function(req, res, next) {
 router.post('/insert', upload, function(req, res, next) {
 
-    // var item = {
-    //     title: req.body.fieldname,
-    //     content: req.file.path,
-    //     author: req.file.destination,
-    //     filename: req.file.filename
-    // };
   var item = {
     title: req.body.title,
     content: req.body.content,

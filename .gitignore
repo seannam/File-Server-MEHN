@@ -2,4 +2,5 @@
 data/
 ngrok
 node_modules/
-uploads/
+.DS_Store
+public/.DS_Store
